@@ -1,0 +1,95 @@
+
+.input_fields_wrap input {
+    margin-top: 10px;
+}
+.input_fields_wrap span {margin-top:10px; display:block;}
+
+input[type="text"] {
+    width: 173px;
+    display: inline;
+    margin-top: 10px;
+}
+input[type="number"] {
+    width: 50px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+a.remove_field {
+    padding: 0 10px;
+}
+span.step {
+    font-size: 18px;
+    vertical-align: sub;
+}
+.step{
+    background: aliceblue;
+    padding: 50px;
+    width: 600px;
+    margin: 0 auto;
+}
+
+.inputWrapper {
+    background: aliceblue;
+    padding: 25px 0;
+    margin-right: -25px;
+    text-align: center;
+}
+.inlineBlock strong {
+    vertical-align: bottom;
+}
+.inputWrapper span {
+    margin-top: 12px;
+    display: block;
+}
+.hidden-div > ul {
+    display: none;
+}
+.hidden-div {
+    margin-top: 25px;
+    text-align: center;
+}
+.input_fields_wrap button {
+    background: #1d8804;
+    color: white;
+    font-size: 18px;
+    padding: 5px 10px;
+    margin-top: 10px;
+}
+pre#result {
+    margin-top: 10px;
+}
+.step3 {
+    display: none;
+}
+.input_fields_wrap {
+    text-align: center;
+    background: #4b4b4b;
+    padding: 100px;
+}
+#result th {
+    width: 9%;
+    text-align: center;
+}
+#result td {
+    text-align: center;
+}
+.tableizer-table th {
+    background-color: #333;
+    color: #FFF;
+    font-weight: 700;
+    text-align: center;
+    font-size: larger;
+    padding: 10px 0;
+}
+table.tableizer-table {
+    border: 1px solid #CCC;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: 12px;
+    width: 100%;
+}
+#result {
+    margin-top: 10px;
+}
+#result th:nth-of-type(2), #result td:nth-of-type(2) {
+    display: none!important;
+}
