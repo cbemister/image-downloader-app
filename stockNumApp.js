@@ -57,7 +57,7 @@ var stockNumApp = {
 	},
 	ajaxComplete: function () {
 		$(document).
-		ajaxComplete(function (event, request, settings) {
+		ajaxComplete(function () {
 			stockNumApp.swapImgSource($(this));
 			stockNumApp.loopActions($(this));
 		});
@@ -99,12 +99,10 @@ var stockNumApp = {
 				$(table).append(TableRow);
 			});
 			return ($(table));
-		};
-
+		}
 		var mydata = eval(stockNumApp.vehicleData);
 		var table = makeTable(mydata);
 		$(table).appendTo("#result");
-
 	},
 	loadImages: function (item) {
 
@@ -115,24 +113,20 @@ var stockNumApp = {
 			var originalFileName = $(item).find('.image-wrap img').attr('src');
 			var newFileName = originalFileName.replace('/resize/3', '/resize/10');
 			$('.hidden-div').append('<a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="test picture"></a>');
-
 		}
-
 	},
 	downloadImages: function () {
-
 		$('a.download_file > img').each(function () {
 			$(this).trigger("click");
 		});
 		return false; //cancel navigation
-
 	},
 	downloadInfo: function () {
 
 		function convertArrayOfObjectsToCSV(args) {
 			var result, ctr, keys, columnDelimiter, lineDelimiter, data;
 			data = args.data || null;
-			if (data == null || !data.length) {
+			if (data === null || !data.length) {
 				return null;
 			}
 			columnDelimiter = args.columnDelimiter || ',';
@@ -152,13 +146,12 @@ var stockNumApp = {
 			});
 			return result;
 		}
-
 		function downloadCSV(args) {
 			var data, filename, link;
 			var csv = convertArrayOfObjectsToCSV({
 				data: stockNumApp.vehicleData
 			});
-			if (csv == null) return;
+			if (csv === null) return;
 			filename = args.filename || 'export.csv';
 			if (!csv.match(/^data:text\/csv/i)) {
 				csv = 'data:text/csv;charset=utf-8,' + csv;
@@ -169,11 +162,9 @@ var stockNumApp = {
 			link.setAttribute('download', filename);
 			link.click();
 		}
-
 		downloadCSV({
 			filename: "vehicle-data.csv"
 		});
-
 	},
 	swapImgSource: function () {
 		var x;
@@ -183,17 +174,14 @@ var stockNumApp = {
 
 			for (x = 10; x <= numItems; x++) {
 
-				var imgLocation = $('div.hidden-div > ul > li:nth-child(' + x + ') > div.image-wrap.carouselimages > img.lazy-image.photo.thumb')
+				var imgLocation = $('div.hidden-div > ul > li:nth-child(' + x + ') > div.image-wrap.carouselimages > img.lazy-image.photo.thumb');
 				var imgSrc = $(imgLocation).attr('data-src');
 				$(imgLocation).attr('src', imgSrc);
-
 			}
-
 		}
-
 	},
 	cssChanges: function () {
-		if (this.step == 1) {
+		if (this.step === 1) {
 			$('button.download_csv_button').css('display', 'none');
 			$('button.reset_page_button').css('display', 'none');
 		} else {
@@ -203,8 +191,6 @@ var stockNumApp = {
 			$('input[type="text"]').prop("disabled", true);
 			$('span.comment').text('Content Loaded Successfully');
 		}
-
 	}
-
 };
 stockNumApp.init();
