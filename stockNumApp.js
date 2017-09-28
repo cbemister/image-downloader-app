@@ -69,7 +69,7 @@ var stockNumApp = {
 	},
 	ajaxComplete: function () {
 		$(document).
-		ajaxComplete(function (event, request, settings) {
+		ajaxComplete(function () {
 			stockNumApp.swapImgSource($(this));
 			stockNumApp.loopActions($(this));
 		});
@@ -110,12 +110,13 @@ var stockNumApp = {
 				TableRow += "</tr>";
 				$(table).append(TableRow);
 			});
-			
+
 				return ($(table));
 		}
 		var mydata = eval(stockNumApp.vehicleData);
 		var table = makeTable(mydata);
 			$(table).prependTo("#result");
+
 	},
 	loadImages: function (item) {
 		var currentStockNumber = $(item).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1);
@@ -136,7 +137,7 @@ var stockNumApp = {
 		function convertArrayOfObjectsToCSV(args) {
 			var result, ctr, keys, columnDelimiter, lineDelimiter, data;
 			data = args.data || null;
-			if (data == null || !data.length) {
+			if (data === null || !data.length) {
 				return null;
 			}
 			columnDelimiter = args.columnDelimiter || ',';
@@ -161,7 +162,7 @@ var stockNumApp = {
 			var csv = convertArrayOfObjectsToCSV({
 				data: stockNumApp.vehicleData
 			});
-			if (csv == null) return;
+			if (csv === null) return;
 			filename = args.filename || 'export.csv';
 			if (!csv.match(/^data:text\/csv/i)) {
 				csv = 'data:text/csv;charset=utf-8,' + csv;
@@ -172,11 +173,9 @@ var stockNumApp = {
 			link.setAttribute('download', filename);
 			link.click();
 		}
-
 		downloadCSV({
 			filename: "vehicle-data.csv"
 		});
-
 	},
 	swapImgSource: function () {
 		var x;
@@ -188,9 +187,10 @@ var stockNumApp = {
 					$(imgLocation).attr('src', imgSrc);
 				}
 			}
+
 	},
 	cssChanges: function () {
-		if (this.step == 1) {
+		if (this.step === 1) {
 			$('button.download_csv_button').css('display', 'none');
 			$('button.reset_page_button').css('display', 'none');
 		} else {
