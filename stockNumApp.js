@@ -3,6 +3,7 @@ var stockNumApp = {
 	stockNumbers: "",
 	stockNumbersArray: [],
 	vehicleData: [],
+	inputVal: "",
 	filePath: "",
 	fileName: "",
 	domain: document.domain,
@@ -22,26 +23,37 @@ var stockNumApp = {
 		this.$hiddenDiv = this.$el.find('.hidden-div');
 		this.$listItem = this.$el.find('li.item.hproduct');
 		this.$result = this.$el.find('#result');
+		this.$tableQty = this.$el.find('table');
 	},
 	bindEvents: function () {
 		this.$get_button.on('click', this.getStockNumbers.bind(this));
 		this.$get_button.on('click', this.loadVehicleData.bind(this));
 		this.$get_button.on('click', this.ajaxComplete.bind(this));
-		this.$get_button.on('click', this.cssChanges);
+		this.$get_button.on('click', this.cssChanges.bind(this));
 		this.$download_button.on('click', this.downloadImages.bind(this));
 		this.$download_button.on('click', this.downloadInfo.bind(this));
+		this.$reset_button.on('click', this.resetBtn.bind(this));
 	},
 	getStockNumbers: function () {
 		var i = 0;
-		var inputVal = this.$input.val();
-		var inputArray = inputVal.split(" ");
+		this.inputVal = this.$input.val();
+		var inputArray = this.inputVal.split(" ");
 		var inputArrayLength = inputArray.length;
-		for (i = 0; i < inputArrayLength; i++) {
-			this.stockNumbersArray.push(inputArray[i]);
+
+		if (this.inputVal !== "") {
+			for (i = 0; i < inputArrayLength; i++) {
+				this.stockNumbersArray.push(inputArray[i]);
+			}
+			this.stockNumbers = this.stockNumbersArray.join('+OR+');
+			//this.$input.val('');
+			this.step = 2;
+			$('input[type="text"]').prop("disabled", true);
+			$('span.comment').text('Content Loaded Successfully');
+		} else {
+			$('span.comment').text('Please enter a valid stock number.');
+			this.step = 1;
+			return;
 		}
-		this.stockNumbers = this.stockNumbersArray.join('+OR+');
-		this.$input.val('');
-		this.step = 2;
 	},
 	loadVehicleData: function () {
 		this.$hiddenDiv.load("/all-inventory/index.htm?search=" + this.stockNumbers + " ul.gv-inventory-list.normal-grid.list-unstyled").bind(this);
@@ -98,21 +110,21 @@ var stockNumApp = {
 				TableRow += "</tr>";
 				$(table).append(TableRow);
 			});
-			return ($(table));
+
+				return ($(table));
 		}
 		var mydata = eval(stockNumApp.vehicleData);
 		var table = makeTable(mydata);
-		$(table).appendTo("#result");
+			$(table).prependTo("#result");
+
 	},
 	loadImages: function (item) {
-
 		var currentStockNumber = $(item).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1);
-
 		if ((this.stockNumbersArray.indexOf(currentStockNumber)) > -1) {
 
 			var originalFileName = $(item).find('.image-wrap img').attr('src');
 			var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-			$('.hidden-div').append('<a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="test picture"></a>');
+			$('#result').append('<a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="test picture"></a>');
 		}
 	},
 	downloadImages: function () {
@@ -122,7 +134,6 @@ var stockNumApp = {
 		return false; //cancel navigation
 	},
 	downloadInfo: function () {
-
 		function convertArrayOfObjectsToCSV(args) {
 			var result, ctr, keys, columnDelimiter, lineDelimiter, data;
 			data = args.data || null;
@@ -169,16 +180,14 @@ var stockNumApp = {
 	swapImgSource: function () {
 		var x;
 		var numItems = $('li.item.hproduct').length;
-
-		if (numItems >= 10) {
-
-			for (x = 10; x <= numItems; x++) {
-
-				var imgLocation = $('div.hidden-div > ul > li:nth-child(' + x + ') > div.image-wrap.carouselimages > img.lazy-image.photo.thumb');
-				var imgSrc = $(imgLocation).attr('data-src');
-				$(imgLocation).attr('src', imgSrc);
+			if (numItems >= 10) {
+				for (x = 10; x <= numItems; x++) {
+					var imgLocation = $('div.hidden-div > ul > li:nth-child(' + x + ') > div.image-wrap.carouselimages > img.lazy-image.photo.thumb');
+					var imgSrc = $(imgLocation).attr('data-src');
+					$(imgLocation).attr('src', imgSrc);
+				}
 			}
-		}
+
 	},
 	cssChanges: function () {
 		if (this.step === 1) {
@@ -188,9 +197,10 @@ var stockNumApp = {
 			$('button.download_csv_button, button.reset_page_button').css('display', 'initial');
 			$('button.get_info_button, button.reset_page_button').css('background', '#939393');
 			$('button.get_info_button').css('display', 'none');
-			$('input[type="text"]').prop("disabled", true);
-			$('span.comment').text('Content Loaded Successfully');
 		}
+	},
+	resetBtn: function () {
+			location.reload();
 	}
 };
 stockNumApp.init();
