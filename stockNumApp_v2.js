@@ -9,10 +9,13 @@ var stockNumApp = {
     , domain: document.domain
     , step: 1
     , singleSearch: null
+    , selectImage: ""
+    , savedImages: []
     , init: function () {
         this.cacheDom();
         this.bindEvents();
         this.cssChanges();
+        this.showDivOnScroll();
     }
     , cacheDom: function () {
         this.$el = $('#stockNumApp');
@@ -88,11 +91,12 @@ var stockNumApp = {
         this.fileName = this.filePath.split('/').slice(16).join('/');
         var price = $(item).find('.gv-pricing .finalPrice .value').text().replace(',', '');
         var currentStockNumber = $(item).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1);
-        if (this.singleSearch === true && (this.stockNumbers === currentStockNumber || (this.stockNumbersArray.indexOf(currentStockNumber)) > -1)) {
+
+        function pushData() {
             stockNumApp.vehicleData.push({
                 stockNumber: $(item).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1)
                 , pageURL: stockNumApp.domain + $(item).find('.inventory-title a').attr("href")
-                , imgFileName: this.fileName
+                , imgFileName: stockNumApp.fileName
                 , Type: $(item).find('.inventory-title a').attr("href").split('/').slice(1, 2).join('/')
                 , Year: $(item).attr("data-year")
                 , Make: $(item).attr("data-make")
@@ -102,6 +106,11 @@ var stockNumApp = {
                 , exteriorColour: $(item).find('.gv-description [data-name="exteriorColor"] span').text().slice(0, -1)
                 , price: price
             });
+        }
+        if (this.singleSearch === true) {
+            if ((this.stockNumbers === currentStockNumber) || (this.stockNumbersArray.indexOf(currentStockNumber) > -1)) {
+                pushData();
+            }
         }
     }
     , makeTable: function () {
@@ -132,8 +141,11 @@ var stockNumApp = {
                 $('.image-wrap img').each(function (i) {
                     var originalFileName = $(this).attr('src');
                     var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-                    $('#result').append('<label for="toggle-' + i + '">Select Image For Download</label><input type="checkbox" id="toggle-' + i + '"><a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="test picture"></a>');
+                    $('#result').append('<input type="checkbox" id="toggle-' + i + '"><label class="selectImage" for="toggle-' + i + '">Select Image For Download</label><a  download="' + newFileName + '"><img src="' + newFileName + '" alt="vehicle photo" class="vehiclePhoto"></a>');
                 });
+                //href="' + newFileName + '"
+                this.selectImage();
+                this.setImageIndex();
             }
         }
         else {
@@ -141,20 +153,76 @@ var stockNumApp = {
             if ((this.stockNumbersArray.indexOf(currentStockNumber)) > -1) {
                 var originalFileName = $(item).find('.image-wrap img').attr('src');
                 var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-                $('#result').append('<a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="test picture"></a>');
+                $('#result').append('<a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="vehicle photo"></a>');
             }
         }
     }
-    , downloadImages: function () {
-        if (this.singleSearch === true) {
-            console.log('singleSearch/downloadImages');
-        }
-        else {
-            $('a.download_file > img').each(function () {
-                $(this).trigger("click");
-            });
+    , selectImage: function () {
+        $('label.selectImage').on('click', function () {
+            $(this).next('a').toggleClass('download_file');
+            var src = $(this).next('a').find('img').attr('src');
+            var srcThumb = src.replace('1010', '110');
+            var imageIndex = $(this).next('a').find('img').attr('data-image-index');
+            var savedImgIndex = stockNumApp.savedImages.indexOf(imageIndex);
+            $(this).text(function (i, text) {
+                return text === "Select Image For Download" ? "Remove Image" : "Select Image For Download";
+                $('label.selectImage').toggleClass('remove');
+            })
+            if (savedImgIndex > -1) {
+                stockNumApp.savedImages.splice(savedImgIndex, 1);
+                $('#sideBtn img[data-image-index=' + imageIndex + ']').remove();
+            }
+            else {
+                $('#sideBtn').append('<img src="' + srcThumb + '" alt="Thumbnail Image" data-image-index="' + imageIndex + '">');
+                stockNumApp.savedImages.push(imageIndex);
+            }
             return false; //cancel navigation
-        }
+        });
+        $('img.vehiclePhoto').on('click', function () {
+            $(this).closest('a').toggleClass('download_file');
+            var src = $(this).attr('src');
+            var srcThumb = src.replace('1010', '110');
+            var imageIndex = $(this).attr('data-image-index');
+            var savedImgIndex = stockNumApp.savedImages.indexOf(imageIndex);
+            $(this).closest('a').prev().text(function (i, text) {
+                return text === "Select Image For Download" ? "Remove Image" : "Select Image For Download";
+                $('label.selectImage').toggleClass('remove');
+            })
+            if (savedImgIndex > -1) {
+                stockNumApp.savedImages.splice(savedImgIndex, 1);
+                $('#sideBtn img[data-image-index=' + imageIndex + ']').remove();
+            }
+            else {
+                $('#sideBtn').append('<img src="' + srcThumb + '" alt="Thumbnail Image" data-image-index="' + imageIndex + '">');
+                stockNumApp.savedImages.push(imageIndex);
+            }
+        });
+    }
+    , setImageIndex: function () {
+        $('img.vehiclePhoto').each(function (i) {
+            $(this).attr('data-image-index', i);
+        });
+    }
+    , showDivOnScroll: function () {
+        $(document).ready(function () {
+            $("#sideBtn").hide(); //hide your div initially
+            var topOfOthDiv = $(stockNumApp.$download_button).offset().top;
+            $(window).scroll(function () {
+                if ($(window).scrollTop() > topOfOthDiv) { //scrolled past the other div?
+                    $("#sideBtn").show(1600); //reached the desired point -- show div
+                }
+            });
+        });
+    }
+    , downloadImages: function () {
+        $('a.download_file').each(function () {
+            var imageSrc = $(this).attr('download');
+            $(this).attr('href', imageSrc);
+        });
+        $('a.download_file > img').each(function () {
+            $(this).trigger("click");
+        });
+        return false; //cancel navigation
     }
     , downloadInfo: function () {
         function convertArrayOfObjectsToCSV(args) {
