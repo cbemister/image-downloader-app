@@ -94,7 +94,7 @@ var stockNumApp = {
 
         function pushData() {
             stockNumApp.vehicleData.push({
-                stockNumber: $(item).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1)
+                stockNumber: currentStockNumber
                 , pageURL: stockNumApp.domain + $(item).find('.inventory-title a').attr("href")
                 , imgFileName: stockNumApp.fileName
                 , Type: $(item).find('.inventory-title a').attr("href").split('/').slice(1, 2).join('/')
@@ -107,11 +107,12 @@ var stockNumApp = {
                 , price: price
             });
         }
-        if (this.singleSearch === true) {
-            if ((this.stockNumbers === currentStockNumber) || (this.stockNumbersArray.indexOf(currentStockNumber) > -1)) {
+//        if (this.singleSearch === true) {
+            if ((this.stockNumbers === currentStockNumber) || (this.stockNumbersArray.indexOf(currentStockNumber) > -1))  {
                 pushData();
-            }
-        }
+                console.log('single search true');
+            } 
+//        }
     }
     , makeTable: function () {
         function makeTable(mydata) {
@@ -141,9 +142,8 @@ var stockNumApp = {
                 $('.image-wrap img').each(function (i) {
                     var originalFileName = $(this).attr('src');
                     var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-                    $('#result').append('<input type="checkbox" id="toggle-' + i + '"><label class="selectImage" for="toggle-' + i + '">Select Image For Download</label><a  download="' + newFileName + '"><img src="' + newFileName + '" alt="vehicle photo" class="vehiclePhoto"></a>');
+                    $('#result').append('<input type="checkbox" id="toggle-' + i + '"><label class="selectImage" for="toggle-' + i + '">Select Image For Download</label><a  download="' + newFileName + '"><img src="' + newFileName + '" alt="vehicle photo" class="vehiclePhoto thumbnail"></a>');
                 });
-                //href="' + newFileName + '"
                 this.selectImage();
                 this.setImageIndex();
             }
@@ -153,7 +153,7 @@ var stockNumApp = {
             if ((this.stockNumbersArray.indexOf(currentStockNumber)) > -1) {
                 var originalFileName = $(item).find('.image-wrap img').attr('src');
                 var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-                $('#result').append('<a href="' + newFileName + '" download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="vehicle photo"></a>');
+                $('#result').append('<a download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="vehicle photo"></a>');
             }
         }
     }
