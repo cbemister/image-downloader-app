@@ -9,9 +9,11 @@ var stockNumApp = {
         , domain: document.domain
         , step: 1
         , singleSearch: null
+		, tableLoaded: null
+		, picturesLoaded: null
+		, currentItem: ""
         , selectImage: ""
         , savedImages: []
-		, executed: null
         , init: function () {
             this.cacheDom();
             this.bindEvents();
@@ -128,11 +130,10 @@ var stockNumApp = {
         }
     }, makeTable: function () {
 		
-		var something = (function () {
-			//stockNumApp.executed = false;
+		var details = (function () {
 			return function () {
-				if (!stockNumApp.executed) {
-					stockNumApp.executed = true;
+				if (!stockNumApp.tableLoaded) {
+					stockNumApp.tableLoaded = true;
 
 					function makeTable(mydata) {
 						var table = $('<table border=1 class="tableizer-table">');
@@ -160,29 +161,47 @@ var stockNumApp = {
 			};
 		})();
 		
-		something();
+		details();
 		
 
     }, loadImages: function (item) {
-        var currentStockNumber = $(item).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1);
-        if (this.singleSearch === true) {
-            if (this.stockNumbers === currentStockNumber) {
-                $('.image-wrap img').each(function (i) {
-                    var originalFileName = $(this).attr('src');
-                    var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-                    $('#result').append('<input type="checkbox" id="toggle-' + i + '"><label class="selectImage" for="toggle-' + i + '">Select Image For Download</label><a  download="' + newFileName + '"><img src="' + newFileName + '" alt="vehicle photo" class="vehiclePhoto thumbnail"></a>');
-                });
-                this.selectImage();
-                this.setImageIndex();
-            }
-        }
-        else {
-            if ((this.stockNumbersArray.indexOf(currentStockNumber)) > -1) {
-                var originalFileName = $(item).find('.image-wrap img').attr('src');
-                var newFileName = originalFileName.replace('/resize/3', '/resize/10');
-                $('#result').append('<a download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="vehicle photo"></a>');
-            }
-        }
+       
+		this.currentItem = item;
+
+		var images = (function () {
+			
+			
+			return function () {
+				
+				if (!stockNumApp.picturesLoaded) {
+					stockNumApp.picturesLoaded = true;
+
+					var currentStockNumber = $(stockNumApp.currentItem).find('.gv-description [data-name="stockNumber"] span').text().slice(0, -1);
+					if (stockNumApp.singleSearch === true) {
+						if (stockNumApp.stockNumbers === currentStockNumber) {
+							$('.image-wrap img').each(function (i) {
+								var originalFileName = $(stockNumApp).attr('src');
+								var newFileName = originalFileName.replace('/resize/3', '/resize/10');
+								$('#result').append('<input type="checkbox" id="toggle-' + i + '"><label class="selectImage" for="toggle-' + i + '">Select Image For Download</label><a  download="' + newFileName + '"><img src="' + newFileName + '" alt="vehicle photo" class="vehiclePhoto thumbnail"></a>');
+							});
+							stockNumApp.selectImage();
+							stockNumApp.setImageIndex();
+						}
+					} else {
+						if ((stockNumApp.stockNumbersArray.indexOf(currentStockNumber)) > -1) {
+							var originalFileName = $(stockNumApp.currentItem).find('.image-wrap img').attr('src');
+							var newFileName = originalFileName.replace('/resize/3', '/resize/10');
+							$('#result').append('<a download="' + newFileName + '" class="download_file"><img src="' + newFileName + '" alt="vehicle photo"></a>');
+						}
+					}
+
+
+				}
+			};
+		})();
+
+		images();
+
     }, selectImage: function () {
         $('label.selectImage').on('click', function () {
             $(this).next('a').toggleClass('download_file');
@@ -332,7 +351,8 @@ var stockNumApp = {
         $('input[type="text"]').val('').prop("disabled", false);
         $('span.comment').text('');
         this.step = 1;
-		this.executed = null;
+		this.tableLoaded = null;
+		this.picturesLoaded = null;
         
         this.stockNumbers = "",
         this.stockNumbersArray = [],
